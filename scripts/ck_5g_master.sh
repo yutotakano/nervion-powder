@@ -85,7 +85,7 @@ source <(kubectl completion bash)
 # kubectl get nodes --kubeconfig=${KUBEHOME}/admin.conf -s https://155.98.36.111:6443
 
 # Deploy Prometheus
-sudo kubectl create -f config/test/prometheus.yaml
+sudo kubectl create -f config/test/victoria-metrics.yaml
 
 # Deploy Grafana
 sudo kubectl create -f config/test/grafana.yaml

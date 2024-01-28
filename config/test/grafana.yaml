@@ -54,12 +54,12 @@ data:
     apiVersion: 1
 
     datasources:
-      - name: CoreKube Prometheus
+      - name: CoreKube Prometheus (Victoria Metrics)
         type: prometheus
         access: proxy
         orgId: 1
         uid: prometheus-datasource-1
-        url: http://corekube-prometheus.prometheus.svc.cluster.local:9090
+        url: http://corekube-victoria.victoria.svc.cluster.local:9090
         user:
         database:
         basicAuth:

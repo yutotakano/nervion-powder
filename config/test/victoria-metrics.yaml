@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: victoria
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: corekube-victoria-conf
+  namespace: victoria
+  labels:
+    name: corekube-victoria-conf
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 1s
+    scrape_configs:
+      - job_name: corekube-metrics-monitor
+        static_configs:
+        - targets: ['corekube-metrics-export-service.default.svc.cluster.local:5050'] # Kubernetes DNS will resolve this to the corresponding service
+        - targets: ['core-metrics-aggregator.default.svc.cluster.local:8000']
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: victoria
+  name: corekube-victoria
+  labels:
+    app: corekube-victoria
+spec:
+  type: ClusterIP
+  selector:
+    app: corekube-victoria
+  ports:
+  - port: 8428
+    targetPort: 8428
+    protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: corekube-victoria
+  namespace: victoria
+spec:
+  selector:
+    matchLabels:
+      app: corekube-victoria
+  template:
+    metadata:
+      labels:
+        app: corekube-victoria
+    spec:
+      containers:
+      - name: victoria
+        image: victoriametrics/victoria-metrics
+        args:
+          - "--promscrape.config=/etc/prometheus/prometheus.yml"
+        ports:
+        - containerPort: 8428
+        volumeMounts:
+        - name: corekube-victoria-config-volume
+          mountPath: /etc/prometheus/
+      volumes:
+      - name: corekube-victoria-config-volume
+        configMap:
+          name: corekube-victoria-conf
