@@ -29,77 +29,14 @@
       },
       "fieldConfig": {
         "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "dark-yellow",
-                "value": null
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 3,
-        "x": 0,
-        "y": 0
-      },
-      "id": 7,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "value_and_name"
-      },
-      "pluginVersion": "10.1.4",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus-datasource-1"
-          },
-          "disableTextWrap": false,
-          "editorMode": "code",
-          "expr": "label_replace(coremon_ue_count_last_5_seconds, \"name\", \"Connected UEs\", \"\", \"\")",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "{{name}}",
-          "range": true,
-          "refId": "A",
-          "useBackend": false
-        }
-      ],
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus-datasource-1"
-      },
-      "fieldConfig": {
-        "defaults": {
           "color": {
-            "fixedColor": "dark-yellow",
-            "mode": "fixed"
+            "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "UE Count",
+            "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
@@ -111,7 +48,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -128,38 +65,44 @@
             }
           },
           "mappings": [],
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "dark-yellow",
+                "color": "green",
                 "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
               }
             ]
-          }
+          },
+          "unit": "µs",
+          "unitScale": true
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 7,
-        "w": 9,
-        "x": 3,
+        "h": 9,
+        "w": 12,
+        "x": 0,
         "y": 0
       },
-      "id": 6,
+      "id": 15,
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+          "displayMode": "hidden",
+          "placement": "right",
+          "showLegend": false
         },
         "tooltip": {
           "mode": "single",
           "sort": "none"
         }
       },
+      "pluginVersion": "10.3.1",
       "targets": [
         {
           "datasource": {
@@ -168,17 +111,68 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "label_replace(coremon_ue_count_last_5_seconds, \"name\", \"UEs Seen in last 5 Seconds\", \"\", \"\")",
+          "expr": "avg by(message_type) (rate(message_amf_encode_latency_count[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "{{name}} ",
+          "legendFormat": "Encode {{message_type}}",
           "range": true,
           "refId": "A",
           "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus-datasource-1"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "avg by(message_type) (rate(message_amf_decode_latency_sum[$__rate_interval]))",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": false,
+          "instant": false,
+          "legendFormat": "Decode {{message_type}}",
+          "range": true,
+          "refId": "B",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus-datasource-1"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "avg by(message_type) (rate(message_amf_handle_latency_sum[$__rate_interval]))",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "Handle {{message_type}}",
+          "range": true,
+          "refId": "C",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus-datasource-1"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "avg by(message_type) (rate(message_amf_send_latency_sum[$__rate_interval]))",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "Send {{message_type}}",
+          "range": true,
+          "refId": "D",
+          "useBackend": false
         }
       ],
-      "title": "Estimated Number of Connected UEs",
+      "title": "Latency per operation",
       "type": "timeseries"
     },
     {
@@ -199,7 +193,8 @@
               }
             ]
           },
-          "unit": "pps"
+          "unit": "pps",
+          "unitScale": true
         },
         "overrides": [
           {
@@ -235,7 +230,7 @@
         ]
       },
       "gridPos": {
-        "h": 11,
+        "h": 5,
         "w": 3,
         "x": 12,
         "y": 0
@@ -253,9 +248,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.4",
+      "pluginVersion": "10.3.1",
       "targets": [
         {
           "datasource": {
@@ -303,9 +300,423 @@
       "fieldConfig": {
         "defaults": {
           "color": {
+            "fixedColor": "semi-dark-purple",
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Latency",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 9,
+        "x": 15,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus-datasource-1"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "exemplar": false,
+          "expr": "label_replace(label_replace(label_replace(label_replace(label_replace(avg without(ue_id) (coremon_latency), \"name\", \"Registration Request\", \"uplink_msg_type\", \"65\"), \"name\", \"Authentication\", \"uplink_msg_type\", \"87\"), \"name\", \"Registration Accept\", \"uplink_msg_type\", \"94\"), \"name\", \"5G PDU Session\", \"uplink_msg_type\", \"193\"), \"name\", \"Deregistration\", \"uplink_msg_type\", \"69\")",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "{{name}}",
+          "range": true,
+          "refId": "Latency per msg type",
+          "useBackend": false
+        }
+      ],
+      "title": "CoreKube Latency",
+      "transformations": [],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus-datasource-1"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 5
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          },
+          "unit": "s",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 12,
+        "y": 5
+      },
+      "id": 9,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus-datasource-1"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "label_replace(avg (coremon_latency), \"name\", \"Average Latency\", \"\", \"\")",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "{{name}}",
+          "range": true,
+          "refId": "Average Latency"
+        }
+      ],
+      "transformations": [],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus-datasource-1"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "dark-yellow",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "UE Count",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-yellow",
+                "value": null
+              }
+            ]
+          },
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus-datasource-1"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "label_replace(coremon_ue_count_last_5_seconds, \"name\", \"UEs Seen in last 5 Seconds\", \"\", \"\")",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "{{name}} ",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Estimated Number of Connected UEs",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus-datasource-1"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-yellow",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 3,
+        "x": 12,
+        "y": 9
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus-datasource-1"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "expr": "label_replace(coremon_ue_count_last_5_seconds, \"name\", \"Connected UEs\", \"\", \"\")",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "{{name}}",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus-datasource-1"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "light-purple",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 3,
+        "x": 12,
+        "y": 11
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus-datasource-1"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "expr": "label_replace(count(coremon_cpu_usage{namespace=\"default\", container_name=\"corekube-worker\"}), \"name\", \"Worker Count\", \"\", \"\")",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "{{name}}",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus-datasource-1"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "Estimated packet rate",
@@ -351,7 +762,8 @@
               }
             ]
           },
-          "unit": "pps"
+          "unit": "pps",
+          "unitScale": true
         },
         "overrides": [
           {
@@ -390,7 +802,7 @@
         "h": 11,
         "w": 9,
         "x": 15,
-        "y": 0
+        "y": 12
       },
       "id": 11,
       "options": {
@@ -454,76 +866,10 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#28a5af",
-                "value": null
-              }
-            ]
-          },
-          "unit": "si: cores"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 3,
-        "x": 0,
-        "y": 7
-      },
-      "id": 14,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "value_and_name"
-      },
-      "pluginVersion": "10.1.4",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus-datasource-1"
-          },
-          "disableTextWrap": false,
-          "editorMode": "code",
-          "expr": "label_replace(sum(coremon_cpu_usage{namespace=\"default\", container_name!=\"corekube-core-monitor\"}), \"name\", \"CPU Total\", \"\", \"\")",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "{{name}}",
-          "range": true,
-          "refId": "DB",
-          "useBackend": false
-        }
-      ],
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus-datasource-1"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "Cores",
@@ -572,15 +918,16 @@
               }
             ]
           },
-          "unit": "si:"
+          "unit": "si:",
+          "unitScale": true
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
-        "w": 9,
-        "x": 3,
-        "y": 7
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
       },
       "id": 10,
       "options": {
@@ -625,366 +972,11 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#28a5af",
-                "value": null
-              }
-            ]
-          },
-          "unit": "si: cores"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 3,
-        "x": 0,
-        "y": 11
-      },
-      "id": 13,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.1.4",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus-datasource-1"
-          },
-          "disableTextWrap": false,
-          "editorMode": "code",
-          "expr": "label_replace(coremon_cpu_usage{namespace=\"default\", container_name=\"corekube-db\"}, \"name\", \"DB\", \"pod_name\", \"corekube-db-[^-]+-(.*)\")",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "{{name}}",
-          "range": true,
-          "refId": "DB",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus-datasource-1"
-          },
-          "editorMode": "builder",
-          "expr": "label_replace(coremon_cpu_usage{namespace=\"default\", container_name=\"corekube-frontend\"}, \"name\", \"Frontend\", \"pod_name\", \"corekube-frontend-[^-]+-(.*)\")",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "{{name}}",
-          "range": true,
-          "refId": "Frontend"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus-datasource-1"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "label_replace(avg(coremon_cpu_usage{namespace=\"default\", container_name=\"corekube-worker\"}), \"name\", \"Worker Avg\", \"\", \"\")",
-          "fullMetaSearch": false,
-          "hide": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "{{name}}",
-          "range": true,
-          "refId": "Avg Worker",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus-datasource-1"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "label_replace(sum(coremon_cpu_usage{namespace=\"default\", container_name=\"corekube-worker\"}), \"name\", \"Worker Total\", \"\", \"\")",
-          "fullMetaSearch": false,
-          "hide": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "{{name}}",
-          "range": true,
-          "refId": "Total Worker",
-          "useBackend": false
-        }
-      ],
-      "title": "CPU Breakdown",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus-datasource-1"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "#EAB839",
-                "value": 5
-              },
-              {
-                "color": "red",
-                "value": 10
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 12,
-        "w": 3,
-        "x": 12,
-        "y": 11
-      },
-      "id": 9,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "value_and_name"
-      },
-      "pluginVersion": "10.1.4",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus-datasource-1"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "label_replace(avg (coremon_latency), \"name\", \"Average Latency\", \"\", \"\")",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "{{name}}",
-          "range": true,
-          "refId": "Average Latency"
-        }
-      ],
-      "transformations": [],
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus-datasource-1"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "fixedColor": "semi-dark-purple",
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "Latency",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 12,
-        "w": 9,
-        "x": 15,
-        "y": 11
-      },
-      "id": 3,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus-datasource-1"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "exemplar": false,
-          "expr": "label_replace(label_replace(label_replace(label_replace(label_replace(avg without(ue_id) (coremon_latency), \"name\", \"Registration Request\", \"uplink_msg_type\", \"65\"), \"name\", \"Authentication\", \"uplink_msg_type\", \"87\"), \"name\", \"Registration Accept\", \"uplink_msg_type\", \"94\"), \"name\", \"5G PDU Session\", \"uplink_msg_type\", \"193\"), \"name\", \"Deregistration\", \"uplink_msg_type\", \"69\")",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "{{name}}",
-          "range": true,
-          "refId": "Latency per msg type",
-          "useBackend": false
-        }
-      ],
-      "title": "CoreKube Latency",
-      "transformations": [],
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus-datasource-1"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "light-purple",
-                "value": null
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 3,
-        "x": 0,
-        "y": 16
-      },
-      "id": 8,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.1.4",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus-datasource-1"
-          },
-          "disableTextWrap": false,
-          "editorMode": "code",
-          "expr": "label_replace(count(coremon_cpu_usage{namespace=\"default\", container_name=\"corekube-worker\"}), \"name\", \"Worker Count\", \"\", \"\")",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "{{name}}",
-          "range": true,
-          "refId": "A",
-          "useBackend": false
-        }
-      ],
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus-datasource-1"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
             "fixedColor": "light-purple",
             "mode": "fixed"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "CK Worker Count",
@@ -1029,15 +1021,16 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unitScale": true
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 7,
-        "w": 9,
-        "x": 3,
-        "y": 16
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 24
       },
       "id": 4,
       "options": {
@@ -1075,8 +1068,7 @@
     }
   ],
   "refresh": "5s",
-  "schemaVersion": 38,
-  "style": "dark",
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": []
@@ -1089,6 +1081,6 @@
   "timezone": "",
   "title": "CoreKube Dashboard",
   "uid": "be3d8ddb-7d64-4ac5-b27c-3b771e5ec831",
-  "version": 6,
+  "version": 2,
   "weekStart": ""
 }

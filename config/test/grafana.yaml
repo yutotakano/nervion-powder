@@ -59,7 +59,7 @@ data:
         access: proxy
         orgId: 1
         uid: prometheus-datasource-1
-        url: http://corekube-victoria.victoria.svc.cluster.local:9090
+        url: http://corekube-victoria.victoria.svc.cluster.local:8428
         user:
         database:
         basicAuth:
