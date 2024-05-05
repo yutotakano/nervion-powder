@@ -21,9 +21,11 @@ export KUBECONFIG=$KUBEHOME/admin.conf
 sudo chsh -s /bin/bash $username
 echo "export KUBECONFIG=${KUBECONFIG}" > $HOME/.profile
 
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
-sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
-echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
+# Kubernetes
+sudo apt-get install -y apt-transport-https ca-certificates curl
+sudo mkdir -m 755 /etc/apt/keyrings
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 cd $WORKINGDIR
 #git clone git@gitlab.flux.utah.edu:licai/deepstitch.git
@@ -56,7 +58,7 @@ ctr image pull docker.io/andrewferguson/corekube-worker5g:latest
 
 # learn from this: https://blog.csdn.net/yan234280533/article/details/75136630
 # more info should see: https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
-sudo apt-get -y install kubelet=1.21.3-00 kubeadm=1.21.3-00 kubectl=1.21.3-00 kubernetes-cni golang-go jq
+sudo apt-get -y install kubelet=1.30.0-1.1 kubeadm=1.30.0-1.1 kubectl=1.30.0-1.1 kubernetes-cni golang-go jq
 sudo docker version
 sudo swapoff -a
 
